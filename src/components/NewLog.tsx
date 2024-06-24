@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -12,8 +14,56 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { GrAdd } from "react-icons/gr"
 import { DatePicker } from "./DatePicker"
+import { useLogStore } from "@/store"
+import { useToast } from "./ui/use-toast"
+import dayjs from "dayjs"
 
 export function NewLog() {
+    // Toast
+    const { toast } = useToast();
+
+    // getting state from Zustand store
+    const log = useLogStore((state) => state.log);
+    const logs = useLogStore((state) => state.logs)
+    const setLog = useLogStore((state) => state.setLog);
+    const setLogs = useLogStore((state) => state.setLogs);
+
+    const closeDialog = () => {
+      document.getElementById("close-btn")?.click()
+    }
+
+    const validateLog = () => {
+        if(!log.date || !log.hour || log.hour === 0){
+          throw "Date or hour can not be empty"
+        }else if (log.hour >= 24){
+          throw "Please enter a valid hour between 0 and 24"
+        }
+    }
+
+    const submitLog = () => {
+      try {
+        validateLog();
+        setLogs(log, dayjs(log.date).format("YYYY-MM-DD"))
+        // console.log(logs)
+        toast({
+          variant: "default",
+          title: "Successfully created Log",
+          description: `${log.hour} hours in ${log.date.toDateString()}`,
+        });
+        closeDialog();
+        // connect to supabase
+
+
+      } catch (error) {
+        console.log(error)
+        toast({
+          variant: "destructive",
+          title: "Failed to create log",
+          description: error as string,
+        })
+      }
+    }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -41,7 +91,16 @@ export function NewLog() {
             <Label htmlFor="hour" className="text-right">
               hour
             </Label>
-            <Input id="hour" type="number" className="col-span-3" />
+            <Input 
+                id="hour"
+                type="number"
+                className="col-span-3"
+                value={log.hour}
+                onChange={(e) => setLog({
+                    ...log, 
+                    hour: parseInt(e.target.value)
+                })}
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="note" className="text-right">
@@ -51,11 +110,16 @@ export function NewLog() {
               id="note"
               placeholder="Enter your note here"
               className="col-span-3"
+              value={log.note}
+              onChange={(e) => setLog({
+                ...log, 
+                note: e.target.value
+              })}
             />
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit">Save</Button>
+          <Button type="submit" onClick={submitLog}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

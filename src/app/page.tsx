@@ -1,7 +1,7 @@
 import Calander from '@/components/Calander'
 import Navbar from '@/components/Navbar'
 import { NewLog } from '@/components/NewLog'
-import { Button } from '@/components/ui/button'
+import { Logs } from '@/components/Logs'
 import React from 'react'
 
 const page = () => {
@@ -10,6 +10,7 @@ const page = () => {
       <Navbar />
       <NewLog /> 
       <Calander />
+      <Logs />
     </div>
   )
 }
