@@ -38,7 +38,7 @@ export function DatePicker() {
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
-          selected={log.date}
+          selected={log.date as Date}
           onSelect={setDate as SelectSingleEventHandler}
           initialFocus
         />
